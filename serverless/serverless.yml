@@ -1,0 +1,55 @@
+service: template
+frameworkVersion: ">=1.60.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'prod'}
+  region: us-east-1
+  memorySize: 128
+  timeout: 10
+  logRetentionInDays: 30
+  deploymentBucket:
+    name: hyiromori-us
+  versionFunctions: false
+  apiKeys:
+    - serverless-template-${self:provider.stage}-apikey
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ssm:GetParameter
+      Resource: "arn:aws:ssm:us-east-1:#{AWS::AccountId}:parameter/parameter-name"
+
+  environment:
+    SERVERLESS_STAGE: ${self:provider.stage}
+
+plugins:
+  - serverless-domain-manager
+  - serverless-offline
+  - serverless-pseudo-parameters
+
+custom:
+  serverless-offline:
+    port: 4000
+  customDomain:
+    domainName: template.hyiromori.com
+    basePath: ''
+    certificateName: "*.hyiromori.com"
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+
+functions:
+  index:
+    handler: handler/api/index.handler
+    events:
+      - http:
+          method: POST
+          path: 'send'
+          cors: true
+          private: true
+
+  batch:
+    handler: handler/batch/index.handler
+    events:
+      - schedule: cron(0 11 * * ? *) # 20:00 (JST)

@@ -1,0 +1,34 @@
+{
+  "name": "serverless-template",
+  "author": "hyiromori",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "scripts": {
+    "deploy": "sls deploy",
+    "domain:create": "sls create_domain",
+    "invoke:news": "sls invoke local --stage dev --function news",
+    "invoke:receive": "sls invoke local --stage dev --function receive",
+    "invoke:remind": "sls invoke local --stage dev --function remind",
+    "lint": "eslint --fix ./handler",
+    "start": "sls offline"
+  },
+  "dependencies": {
+    "log4js": "^4.5.1",
+    "serverless": "^1.60.4",
+    "serverless-domain-manager": "^3.3.1",
+    "serverless-offline": "^5.12.1",
+    "serverless-pseudo-parameters": "^2.5.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.630.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^9.2.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  }
+}
