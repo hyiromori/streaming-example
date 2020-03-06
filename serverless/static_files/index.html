@@ -31,7 +31,7 @@
           }
 
           const prepareResponse = await fetch(`/prepare?content-type=${videoFile.type}`)
-          const { uploadId, uploadUrl } = await prepareResponse.json()
+          const { s3Path, uploadId, uploadUrl } = await prepareResponse.json()
           message.textContent = `Uploading... (${uploadId})`
 
           const uploadS3Response = await fetch(uploadUrl, {
@@ -44,10 +44,19 @@
             return
           }
 
+          const requestConvertResponse = await fetch('/convert_request', {
+            method: 'POST',
+            body: JSON.stringify({ s3Path, uploadId }),
+          })
+          if (!requestConvertResponse.ok) {
+            message.textContent = `ERROR: ${JSON.stringify(requestConvertResponse)}`
+            return
+          }
+
           message.textContent = `SUCCESS: ${uploadId}`
         } catch (err) {
           console.error(err)
-          message.textContent = `ERROR: ${err.message}`
+          message.textContent = `ERROR: ${err}`
         }
       }
     }

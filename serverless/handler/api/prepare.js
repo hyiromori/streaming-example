@@ -1,5 +1,5 @@
-const { v4: uuid } = require('uuid')
 const AWS = require('aws-sdk')
+const { v4: uuid } = require('uuid')
 const { logger } = require('../lib/logger')
 
 const S3 = new AWS.S3({ apiVersion: '2006-03-01' })
@@ -22,6 +22,7 @@ module.exports.handler = async (event) => {
     return {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        s3Path: `s3://${Bucket}/${path}`,
         uploadId: id,
         uploadUrl: result,
       }, null, 2),
