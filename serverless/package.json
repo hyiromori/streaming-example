@@ -8,19 +8,15 @@
   },
   "scripts": {
     "deploy": "sls deploy",
-    "domain:create": "sls create_domain",
-    "invoke:news": "sls invoke local --stage dev --function news",
-    "invoke:receive": "sls invoke local --stage dev --function receive",
-    "invoke:remind": "sls invoke local --stage dev --function remind",
     "lint": "eslint --fix ./handler",
     "start": "sls offline"
   },
   "dependencies": {
     "log4js": "^4.5.1",
     "serverless": "^1.60.4",
-    "serverless-domain-manager": "^3.3.1",
     "serverless-offline": "^5.12.1",
-    "serverless-pseudo-parameters": "^2.5.0"
+    "serverless-pseudo-parameters": "^2.5.0",
+    "uuid": "^7.0.2"
   },
   "devDependencies": {
     "aws-sdk": "^2.630.0",
