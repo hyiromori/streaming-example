@@ -19,13 +19,20 @@ provider:
         - s3:GetObject
         - s3:PutObject
       Resource:
-        - "arn:aws:s3:::${self:custom.s3.uploadBucket}"
+        - "arn:aws:s3:::${self:custom.s3.uploadBucket}/*"
     - Effect: Allow
       # https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/list_awselementalmediaconvert.html
       Action:
         - mediaconvert:CreateJob
         - mediaconvert:GetJob
-      Resource: "arn:aws:mediaconvert:${self:provider.region}:#{AWS::AccountId}:jobs/*"
+      Resource:
+        - "arn:aws:mediaconvert:${self:provider.region}:#{AWS::AccountId}:jobs/*"
+        - "arn:aws:mediaconvert:${self:provider.region}:#{AWS::AccountId}:queues/Default"
+        - "arn:aws:mediaconvert:${self:provider.region}:#{AWS::AccountId}:jobTemplates/HLS_Template"
+    - Effect: Allow
+      Action:
+        - iam:PassRole
+      Resource: "arn:aws:iam::#{AWS::AccountId}:role/MediaConvertRole"
 
   environment:
     SERVERLESS_STAGE: ${self:provider.stage}

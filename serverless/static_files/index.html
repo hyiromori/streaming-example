@@ -30,7 +30,7 @@
             return
           }
 
-          const prepareResponse = await fetch(`./prepare?content-type=${videoFile.type}`)
+          const prepareResponse = await fetch(`./prepare?content-type=${encodeURIComponent(videoFile.type)}`)
           const { s3Path, uploadId, uploadUrl } = await prepareResponse.json()
           message.textContent = `Uploading... (${uploadId})`
 
