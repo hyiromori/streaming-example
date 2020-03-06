@@ -8,13 +8,14 @@ const Bucket = process.env.UPLOAD_BUCKET
 module.exports.handler = async (event) => {
   try {
     const id = uuid()
-    const path = `/source/${id}`
+    const path = `source/${id}`
     const params = {
       Bucket,
       Key: path,
+      ContentType: 'application/octet-stream',
       Expires: 3600, // 1 Hour
     }
-    const result = await S3.getSignedUrl('putObject', params)
+    const result = await S3.getSignedUrlPromise('putObject', params)
 
     return {
       headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,14 @@
 resource "aws_s3_bucket" "streaming_example_cdn" {
   bucket = "streaming-cdn-347676319"
   acl    = "private"
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT"]
+    allowed_origins = ["http://localhost:4000"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
 }
 
 resource "aws_s3_bucket" "streaming_example_cdn_logs" {

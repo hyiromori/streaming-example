@@ -14,9 +14,7 @@
   <p>
     <button id="upload-video">Upload & Convert</button>
   </p>
-  <p>
-  <pre id="message"></pre>
-  </p>
+  <p id="message"></p>
 
   <script type="text/javascript">
     window.onload = () => {
@@ -25,21 +23,33 @@
       const message = document.getElementById('message')
 
       button.onclick = async () => {
-        const videoFile = file.files[0]
-        if (videoFile == null) {
-          console.error('File not selected.')
-          return
+        try {
+          const videoFile = file.files[0]
+          if (videoFile == null) {
+            console.error('File not selected.')
+            return
+          }
+
+          const prepareResponse = await fetch('/prepare')
+          const { uploadId, uploadUrl } = await prepareResponse.json()
+          message.textContent = `Uploading... (${uploadId})`
+
+          const uploadS3Response = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/octet-stream'},
+            body: videoFile,
+          })
+          const uploadResult = await uploadS3Response.text()
+          if (!uploadS3Response.ok) {
+            message.textContent = `ERROR: ${JSON.stringify(uploadResult)}`
+            return
+          }
+
+          message.textContent = `SUCCESS: ${uploadId})`
+        } catch (err) {
+          console.error(err)
+          message.textContent = `ERROR: ${err.message})`
         }
-
-        const prepareResponse = await fetch('/prepare')
-        const { uploadId, uploadUrl } = await prepareResponse.json()
-        message.textContent = `Uploading... (ID: ${uploadId})`
-
-        const uploadS3Response = await fetch(uploadUrl, {
-          method: 'PUT',
-          body: videoFile,
-        })
-        console.log(uploadS3Response)
       }
     }
   </script>

@@ -20,7 +20,6 @@ provider:
         - s3:PutObject
       Resource:
         - "arn:aws:s3:::${self:custom.s3.uploadBucket}"
-      # - "arn:aws:s3:::${self:custom.s3.deliveryBucket}" # 今回は同じバケットなので使わない
     - Effect: Allow
       # https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/list_awselementalmediaconvert.html
       Action:
