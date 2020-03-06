@@ -9,10 +9,12 @@ module.exports.handler = async (event) => {
   try {
     const id = uuid()
     const path = `source/${id}`
+    const contentType = event.queryStringParameters['content-type']
+
     const params = {
       Bucket,
       Key: path,
-      ContentType: 'application/octet-stream',
+      ContentType: contentType,
       Expires: 3600, // 1 Hour
     }
     const result = await S3.getSignedUrlPromise('putObject', params)

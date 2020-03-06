@@ -30,13 +30,12 @@
             return
           }
 
-          const prepareResponse = await fetch('/prepare')
+          const prepareResponse = await fetch(`/prepare?content-type=${videoFile.type}`)
           const { uploadId, uploadUrl } = await prepareResponse.json()
           message.textContent = `Uploading... (${uploadId})`
 
           const uploadS3Response = await fetch(uploadUrl, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/octet-stream'},
             body: videoFile,
           })
           const uploadResult = await uploadS3Response.text()
@@ -45,10 +44,10 @@
             return
           }
 
-          message.textContent = `SUCCESS: ${uploadId})`
+          message.textContent = `SUCCESS: ${uploadId}`
         } catch (err) {
           console.error(err)
-          message.textContent = `ERROR: ${err.message})`
+          message.textContent = `ERROR: ${err.message}`
         }
       }
     }
