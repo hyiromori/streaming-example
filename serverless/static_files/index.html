@@ -30,7 +30,7 @@
             return
           }
 
-          const prepareResponse = await fetch(`/prepare?content-type=${videoFile.type}`)
+          const prepareResponse = await fetch(`./prepare?content-type=${videoFile.type}`)
           const { s3Path, uploadId, uploadUrl } = await prepareResponse.json()
           message.textContent = `Uploading... (${uploadId})`
 
@@ -38,22 +38,25 @@
             method: 'PUT',
             body: videoFile,
           })
-          const uploadResult = await uploadS3Response.text()
           if (!uploadS3Response.ok) {
-            message.textContent = `ERROR: ${JSON.stringify(uploadResult)}`
+            message.textContent = 'アップロードエラー'
             return
           }
 
-          const requestConvertResponse = await fetch('/convert_request', {
+          const requestConvertResponse = await fetch('./convert_request', {
             method: 'POST',
             body: JSON.stringify({ s3Path, uploadId }),
           })
           if (!requestConvertResponse.ok) {
-            message.textContent = `ERROR: ${JSON.stringify(requestConvertResponse)}`
+            message.textContent = '変換リクエストエラー'
             return
           }
 
-          message.textContent = `SUCCESS: ${uploadId}`
+          const result = await requestConvertResponse.json();
+          console.info(result)
+          const {url} = result
+
+          message.innerHTML = `SUCCESS: ${url}<br>数十秒後にSafariで上記のURLを見てください<br>（変換に少し時間がかかります）`
         } catch (err) {
           console.error(err)
           message.textContent = `ERROR: ${err}`

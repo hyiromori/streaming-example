@@ -33,15 +33,15 @@ module.exports.handler = async (event) => {
     const { s3Path, uploadId } = JSON.parse(event.body)
     const params = getParams(s3Path, `s3://${Bucket}/${uploadId}`)
     const job = await MediaConvert.createJob(params).promise()
+    const url = `https://d1wfkbka4um3up.cloudfront.net/${uploadId}/hls.m3u8`
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: true,
+        url,
         job,
-        s3Path,
-        uploadId,
       }, null, 2),
     }
   } catch (e) {
