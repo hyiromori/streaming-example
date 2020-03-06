@@ -2,8 +2,6 @@ const { logger } = require('../lib/logger')
 
 module.exports.handler = async (event) => {
   try {
-    logger.info(event)
-
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -12,6 +10,7 @@ module.exports.handler = async (event) => {
       }, null, 2)
     }
   } catch (e) {
+    logger.error(e)
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

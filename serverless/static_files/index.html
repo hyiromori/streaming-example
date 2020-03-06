@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Video Streaming Test</title>
+</head>
+<body>
+  <h1>Video Streaming Test</h1>
+  <p>
+    <input type="file" id="video-file" />
+  </p>
+  <p>
+    <button id="upload-video">Upload & Convert</button>
+  </p>
+  <p>
+  <pre id="message"></pre>
+  </p>
+
+  <script type="text/javascript">
+    window.onload = () => {
+      const file = document.getElementById('video-file')
+      const button = document.getElementById('upload-video')
+      const message = document.getElementById('message')
+
+      button.onclick = async () => {
+        const videoFile = file.files[0]
+        if (videoFile == null) {
+          console.error('File not selected.')
+          return
+        }
+
+        const prepareResponse = await fetch('/prepare')
+        const { uploadId, uploadUrl } = await prepareResponse.json()
+        message.textContent = `Uploading... (ID: ${uploadId})`
+
+        const uploadS3Response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: videoFile,
+        })
+        console.log(uploadS3Response)
+      }
+    }
+  </script>
+</body>
+</html>
