@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "streaming_example_cdn" {
-  bucket = "streaming-cdn-347676319"
+resource "aws_s3_bucket" "cdn" {
+  bucket = local.project_id
   acl    = "private"
 
   cors_rule {
@@ -11,15 +11,15 @@ resource "aws_s3_bucket" "streaming_example_cdn" {
   }
 }
 
-resource "aws_s3_bucket" "streaming_example_cdn_logs" {
-  bucket = "streaming-cdn-347676319-logs"
+resource "aws_s3_bucket" "cdn_logs" {
+  bucket = "${local.project_id}-logs"
   acl    = "private"
 }
 
 data "aws_iam_policy_document" "s3_policy" {
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.streaming_example_cdn.arn}/*"]
+    resources = ["${aws_s3_bucket.cdn.arn}/*"]
 
     principals {
       type        = "AWS"
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "s3_policy" {
 
   statement {
     actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.streaming_example_cdn.arn]
+    resources = [aws_s3_bucket.cdn.arn]
 
     principals {
       type        = "AWS"
@@ -39,18 +39,18 @@ data "aws_iam_policy_document" "s3_policy" {
 }
 
 resource "aws_s3_bucket_policy" "example" {
-  bucket = aws_s3_bucket.streaming_example_cdn.id
+  bucket = aws_s3_bucket.cdn.id
   policy = data.aws_iam_policy_document.s3_policy.json
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "streaming-cdn-347676319 origin access identity"
+  comment = "${local.project_id} origin access identity"
 }
 
 resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   origin {
-    domain_name = aws_s3_bucket.streaming_example_cdn.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
+    domain_name = aws_s3_bucket.cdn.bucket_regional_domain_name
+    origin_id   = local.project_id
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
@@ -59,19 +59,19 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "streaming-cdn-347676319"
+  comment             = local.project_id
   default_root_object = "index.html"
 
   logging_config {
     include_cookies = false
-    bucket          = "${aws_s3_bucket.streaming_example_cdn_logs.bucket}.s3.amazonaws.com"
+    bucket          = "${aws_s3_bucket.cdn_logs.bucket}.s3.amazonaws.com"
     prefix          = ""
   }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.s3_origin_id
+    target_origin_id = local.project_id
 
     forwarded_values {
       query_string = false

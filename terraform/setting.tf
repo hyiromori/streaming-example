@@ -4,18 +4,23 @@ terraform {
   backend "s3" {
     bucket = "hyiromori"
     region = "ap-northeast-1"
-    key    = "terraform/streaming-example/terraform.tfstate"
+    key    = "terraform/example-video-distribution/terraform.tfstate"
   }
 }
 
 provider "aws" {
-  version = "~>2.18.0"
+  version = ">=2.52.0"
   region  = "ap-northeast-1"
 }
 
 data "aws_caller_identity" "current" {}
 
+variable "environment" {
+  type    = string
+  default = "dev"
+}
+
 locals {
   aws_account_id = data.aws_caller_identity.current.account_id
-  s3_origin_id   = "streaming-cdn-347676319"
+  project_id     = "example-video-distribution-${var.environment}"
 }
