@@ -10,7 +10,7 @@
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
     crossorigin="anonymous"
   >
-  <title>Video Streaming Test</title>
+  <title>Video Distribution TEST</title>
 </head>
 <body>
   <div class="container">
@@ -85,13 +85,28 @@
           console.info(result)
           const { url } = result
 
-          const statusResponse = await fetch(`./info/${videoId}`)
-          console.debug('#####', statusResponse)
+          addMessages('変換完了を待っています...')
+          let latestStatus = ''
+          while (latestStatus !== 'COMPLETE' && latestStatus !== 'ERROR') {
+            await (new Promise((resolve) => setTimeout(resolve, 1000)))
+            const infoResponse = await fetch(`./info/${videoId}`)
+            const text = await infoResponse.text()
+            if (!infoResponse.ok) {
+              throw new Error(text)
+            }
 
-          addMessages('変換に成功しました！')
-          addMessages('')
-          addMessages('以下のリンクをSafariで開くと結果が確認できます')
-          addMessages(`<a href="${url}">${url}</a>`)
+            const json = JSON.parse(text)
+            latestStatus = json.job.Job.Status
+          }
+
+          if (latestStatus === 'COMPLETE') {
+            addMessages('変換に成功しました！')
+            addMessages('')
+            addMessages('以下のリンクをSafariで開くと結果が確認できます')
+            addMessages(`<a href="${url}">${url}</a>`)
+          } else {
+            addMessages('変換に失敗しました😢')
+          }
         } catch (err) {
           console.error(err)
           message.textContent = `ERROR: ${err}`
