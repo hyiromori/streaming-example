@@ -62,7 +62,7 @@
 
           addMessages('アップロード準備をしています...')
           const prepareResponse = await fetch(`./prepare?content-type=${encodeURIComponent(videoFile.type)}`)
-          const { s3Path, uploadId, uploadUrl } = await prepareResponse.json()
+          const { videoId, uploadUrl } = await prepareResponse.json()
 
           addMessages('映像ファイルをアップロードしています...')
           const uploadS3Response = await fetch(uploadUrl, {
@@ -75,20 +75,20 @@
           }
 
           addMessages('映像ファイルの変換をリクエストしています...')
-          const requestConvertResponse = await fetch('./convert_request', {
-            method: 'POST',
-            body: JSON.stringify({ s3Path, uploadId }),
-          })
-          if (!requestConvertResponse.ok) {
+          const convertResponse = await fetch(`./convert/${videoId}`, { method: 'PUT' })
+          if (!convertResponse.ok) {
             alert('変換リクエストに失敗しました')
             return
           }
 
-          const result = await requestConvertResponse.json()
+          const result = await convertResponse.json()
           console.info(result)
           const { url } = result
 
-          addMessages('変換リクエストに成功しました')
+          const statusResponse = await fetch(`./status/${videoId}`)
+          console.debug('#####', statusResponse)
+
+          addMessages('変換に成功しました！')
           addMessages(`<a href="${url}">こちらのリンクをSafariで開くと結果が確認できます</a>`)
         } catch (err) {
           console.error(err)

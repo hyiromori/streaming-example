@@ -2,7 +2,9 @@ const AWS = require('aws-sdk')
 const { logger } = require('../lib/logger')
 
 const Bucket = process.env.S3_BUCKET
+const UploadPrefix = process.env.S3_UPLOAD_PREFIX
 const MediaConvertEndpoint = process.env.MEDIACONVERT_ENDPOINT
+const CloudFrontDomain = process.env.CLOUDFRONT_DOMAIN
 
 const MediaConvert = new AWS.MediaConvert({
   apiVersion: '2017-08-29',
@@ -21,7 +23,14 @@ const getParams = (s3SourcePath, s3DestPath) => ({
       {
         OutputGroupSettings: {
           HlsGroupSettings: {
-            Destination: `${s3DestPath}/hls`,
+            Destination: `${s3DestPath}/hls1/video`,
+          },
+        },
+      },
+      {
+        OutputGroupSettings: {
+          FileGroupSettings: {
+            Destination: `${s3DestPath}/thumbnail/image`,
           },
         },
       },
@@ -32,10 +41,10 @@ const getParams = (s3SourcePath, s3DestPath) => ({
 
 module.exports.handler = async (event) => {
   try {
-    const { s3Path, uploadId } = JSON.parse(event.body)
-    const params = getParams(s3Path, `s3://${Bucket}/${uploadId}`)
+    const videoId = event.pathParameters.id
+    const params = getParams(`s3://${Bucket}/${UploadPrefix}/${videoId}`, `s3://${Bucket}/${videoId}`)
     const job = await MediaConvert.createJob(params).promise()
-    const url = `https://d1wfkbka4um3up.cloudfront.net/${uploadId}/hls.m3u8`
+    const url = `https://${CloudFrontDomain}/${videoId}/hls1/video.m3u8`
 
     return {
       statusCode: 200,

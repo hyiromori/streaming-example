@@ -8,7 +8,7 @@ const Bucket = process.env.S3_BUCKET
 module.exports.handler = async (event) => {
   try {
     const id = uuid()
-    const path = `source/${id}`
+    const path = `_source/${id}`
     const contentType = event.queryStringParameters['content-type']
 
     const params = {
@@ -22,8 +22,7 @@ module.exports.handler = async (event) => {
     return {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        s3Path: `s3://${Bucket}/${path}`,
-        uploadId: id,
+        videoId: id,
         uploadUrl: result,
       }, null, 2),
     }

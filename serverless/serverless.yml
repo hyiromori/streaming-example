@@ -37,6 +37,8 @@ provider:
   environment:
     SERVERLESS_STAGE: ${self:provider.stage}
     S3_BUCKET: ${self:custom.s3_bucket}
+    S3_UPLOAD_PREFIX: "_source"
+    CLOUDFRONT_DOMAIN: "d1wfkbka4um3up.cloudfront.net"
     MEDIACONVERT_ENDPOINT: ${self:custom.mediaconvert_endpoint}
 
 plugins:
@@ -65,11 +67,11 @@ functions:
           path: 'prepare'
 
   convert_request:
-    handler: handler/api/convert_request.handler
+    handler: handler/api/convert.handler
     events:
       - http:
-          method: POST
-          path: 'convert_request'
+          method: PUT
+          path: 'convert/{id}'
 
   status:
     handler: handler/api/status.handler
