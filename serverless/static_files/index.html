@@ -14,14 +14,14 @@
 </head>
 <body>
   <div class="container">
-    <h1>Video Distribution TEST</h1>
+    <h1 class="mt-4 text-center">Video Distribution TEST</h1>
     <div class="container mt-4 text-center">
       <input type="file" class="btn btn-outline-secondary" id="video-file" lang="es">
     </div>
     <div class="container mt-4 text-center">
       <button id="upload-video" type="button" class="btn btn-primary">Upload & Convert</button>
     </div>
-    <div class="container mt-4" id="message"></div>
+    <div class="container mt-4 text-center" id="message"></div>
   </div>
 
   <script
@@ -89,7 +89,9 @@
           console.debug('#####', statusResponse)
 
           addMessages('変換に成功しました！')
-          addMessages(`<a href="${url}">こちらのリンクをSafariで開くと結果が確認できます</a>`)
+          addMessages('')
+          addMessages('以下のリンクをSafariで開くと結果が確認できます')
+          addMessages(`<a href="${url}">${url}</a>`)
         } catch (err) {
           console.error(err)
           message.textContent = `ERROR: ${err}`
