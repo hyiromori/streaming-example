@@ -21,6 +21,7 @@ variable "environment" {
 }
 
 locals {
-  aws_account_id = data.aws_caller_identity.current.account_id
-  project_id     = "example-video-distribution-${var.environment}"
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  api_gateway_domain = "https://s3n72uknj9.execute-api.ap-northeast-1.amazonaws.com"
+  project_id         = "example-video-distribution-${var.environment}"
 }

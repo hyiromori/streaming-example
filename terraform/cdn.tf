@@ -5,7 +5,10 @@ resource "aws_s3_bucket" "cdn" {
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["PUT"]
-    allowed_origins = ["http://localhost:4000"]
+    allowed_origins = [
+      "http://localhost:4000",
+      local.api_gateway_domain
+    ]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }
@@ -47,7 +50,7 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "${local.project_id} origin access identity"
 }
 
-resource "aws_cloudfront_distribution" "cdn" {
+resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   origin {
     domain_name = aws_s3_bucket.cdn.bucket_regional_domain_name
     origin_id   = local.project_id
