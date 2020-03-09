@@ -47,7 +47,7 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "${local.project_id} origin access identity"
 }
 
-resource "aws_cloudfront_distribution" "cloudfront_distribution" {
+resource "aws_cloudfront_distribution" "cdn" {
   origin {
     domain_name = aws_s3_bucket.cdn.bucket_regional_domain_name
     origin_id   = local.project_id

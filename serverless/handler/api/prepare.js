@@ -3,7 +3,7 @@ const { v4: uuid } = require('uuid')
 const { logger } = require('../lib/logger')
 
 const S3 = new AWS.S3({ apiVersion: '2006-03-01' })
-const Bucket = process.env.UPLOAD_BUCKET
+const Bucket = process.env.S3_BUCKET
 
 module.exports.handler = async (event) => {
   try {

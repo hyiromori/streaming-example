@@ -2,20 +2,43 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+    crossorigin="anonymous"
+  >
   <title>Video Streaming Test</title>
 </head>
 <body>
-  <h1>Video Streaming Test</h1>
-  <p>
-    <input type="file" id="video-file" />
-  </p>
-  <p>
-    <button id="upload-video">Upload & Convert</button>
-  </p>
-  <p id="message"></p>
+  <div class="container">
+    <h1>Video Distribution TEST</h1>
+    <div class="container mt-4 text-center">
+      <input type="file" class="btn btn-outline-secondary" id="video-file" lang="es">
+    </div>
+    <div class="container mt-4 text-center">
+      <button id="upload-video" type="button" class="btn btn-primary">Upload & Convert</button>
+    </div>
+    <div class="container mt-4" id="message"></div>
+  </div>
 
+  <script
+    src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"
+  ></script>
   <script type="text/javascript">
     window.onload = () => {
       const file = document.getElementById('video-file')
@@ -23,40 +46,50 @@
       const message = document.getElementById('message')
 
       button.onclick = async () => {
+        message.innerHTML = ''
+        const messages = []
+        const addMessages = (newMessage) => {
+          messages.push(newMessage)
+          message.innerHTML = messages.join('<br>')
+        }
+
         try {
           const videoFile = file.files[0]
           if (videoFile == null) {
-            console.error('File not selected.')
+            alert('映像ファイルを選択してください')
             return
           }
 
+          addMessages('アップロード準備をしています...')
           const prepareResponse = await fetch(`./prepare?content-type=${encodeURIComponent(videoFile.type)}`)
           const { s3Path, uploadId, uploadUrl } = await prepareResponse.json()
-          message.textContent = `Uploading... (${uploadId})`
 
+          addMessages('映像ファイルをアップロードしています...')
           const uploadS3Response = await fetch(uploadUrl, {
             method: 'PUT',
             body: videoFile,
           })
           if (!uploadS3Response.ok) {
-            message.textContent = 'アップロードエラー'
+            alert('映像ファイルのアップロードに失敗しました')
             return
           }
 
+          addMessages('映像ファイルの変換をリクエストしています...')
           const requestConvertResponse = await fetch('./convert_request', {
             method: 'POST',
             body: JSON.stringify({ s3Path, uploadId }),
           })
           if (!requestConvertResponse.ok) {
-            message.textContent = '変換リクエストエラー'
+            alert('変換リクエストに失敗しました')
             return
           }
 
-          const result = await requestConvertResponse.json();
+          const result = await requestConvertResponse.json()
           console.info(result)
-          const {url} = result
+          const { url } = result
 
-          message.innerHTML = `SUCCESS: ${url}<br>数十秒後にSafariで上記のURLを見てください<br>（変換に少し時間がかかります）`
+          addMessages('変換リクエストに成功しました')
+          addMessages(`<a href="${url}">こちらのリンクをSafariで開くと結果が確認できます</a>`)
         } catch (err) {
           console.error(err)
           message.textContent = `ERROR: ${err}`

@@ -4,7 +4,7 @@ frameworkVersion: ">=1.60.0 <2.0.0"
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage, 'prod'}
+  stage: ${opt:stage, 'dev'}
   region: ap-northeast-1
   memorySize: 128
   timeout: 10
@@ -19,7 +19,7 @@ provider:
         - s3:GetObject
         - s3:PutObject
       Resource:
-        - "arn:aws:s3:::${self:custom.s3.uploadBucket}/*"
+        - "arn:aws:s3:::${self:custom.s3_bucket}/*"
     - Effect: Allow
       # https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/list_awselementalmediaconvert.html
       Action:
@@ -36,17 +36,16 @@ provider:
 
   environment:
     SERVERLESS_STAGE: ${self:provider.stage}
-    UPLOAD_BUCKET: "${self:custom.s3.uploadBucket}"
-    DELIVERY_BUCKET: "${self:custom.s3.deliveryBucket}"
+    S3_BUCKET: ${self:custom.s3_bucket}
+    MEDIACONVERT_ENDPOINT: ${self:custom.mediaconvert_endpoint}
 
 plugins:
   - serverless-offline
   - serverless-pseudo-parameters
 
 custom:
-  s3:
-    uploadBucket: streaming-cdn-347676319
-    deliveryBucket: streaming-cdn-347676319
+  s3_bucket: "example-video-distribution-${self:provider.stage}"
+  mediaconvert_endpoint: "https://mpazqbhuc.mediaconvert.ap-northeast-1.amazonaws.com"
   serverless-offline:
     port: 4000
 
@@ -71,3 +70,10 @@ functions:
       - http:
           method: POST
           path: 'convert_request'
+
+  status:
+    handler: handler/api/status.handler
+    events:
+      - http:
+          method: GET
+          path: 'status/{id}'

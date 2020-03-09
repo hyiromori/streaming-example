@@ -1,11 +1,13 @@
 const AWS = require('aws-sdk')
 const { logger } = require('../lib/logger')
 
+const Bucket = process.env.S3_BUCKET
+const MediaConvertEndpoint = process.env.MEDIACONVERT_ENDPOINT
+
 const MediaConvert = new AWS.MediaConvert({
   apiVersion: '2017-08-29',
-  endpoint: 'https://mpazqbhuc.mediaconvert.ap-northeast-1.amazonaws.com',
+  endpoint: MediaConvertEndpoint,
 })
-const Bucket = process.env.DELIVERY_BUCKET
 
 const getParams = (s3SourcePath, s3DestPath) => ({
   Role: 'arn:aws:iam::644989259572:role/MediaConvertRole',
