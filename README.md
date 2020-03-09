@@ -35,14 +35,43 @@ GET /prepare?content-type=video%2Fmp4
 
 ```json
 {
-  "id": "1eb32ed3-40f8-4fcc-be60-e847e5b84844",
-  "uploadUrl": "https"
+  "videoId": "8b8be73c-c955-481e-a3ee-011a0accd51b",
+  "uploadUrl": "ps://example-video-distribution-dev.s3.ap-northeast-1.amazonaws.com/_source/8b8be73c-c955-481e-a3ee-011a0accd51b?AWSAccessKeyId=ASIAZMLC3B42K5GO..."
 }
 ```
 
-#### POST /request_convert
+#### PUT /convert/{video-id}
 
-#### GET /status
+
+**リクエストサンプル**
+
+```text
+PUT /convert/8b8be73c-c955-481e-a3ee-011a0accd51b
+```
+
+**レスポンスサンプル**
+
+```json
+{
+  "url": "https://d1wfkbka4um3up.cloudfront.net/8b8be73c-c955-481e-a3ee-011a0accd51b/hls1/video.m3u8",
+  "job": {<MediaConvertのジョブ情報>}
+}
+```
+
+#### GET /info/{video-id}
+
+```text
+GET /info/8b8be73c-c955-481e-a3ee-011a0accd51b
+```
+
+**レスポンスサンプル**
+
+```json
+{
+  "jobId": "1583726864783-8cdb4i",
+  "job": {<MediaConvertのジョブ情報>}
+}
+```
 
 ### Deploy
 

@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk')
 const { logger } = require('../lib/logger')
 const { getVideoInfo, putVideoInfo } = require('../lib/dynamodb')
+const { getConvertInfo } = require('../lib/mediaconvert')
 
 const Bucket = process.env.S3_BUCKET
 const UploadPrefix = process.env.S3_UPLOAD_PREFIX
@@ -44,29 +45,33 @@ module.exports.handler = async (event) => {
   try {
     const videoId = event.pathParameters.id
     const videoInfo = await getVideoInfo(videoId)
+
     const params = getParams(`s3://${Bucket}/${UploadPrefix}/${videoId}`, `s3://${Bucket}/${videoId}`)
-    const job = await MediaConvert.createJob(params).promise()
     const url = `https://${CloudFrontDomain}/${videoId}/hls1/video.m3u8`
+
+    if (videoInfo.jobId != null) {
+      const job = await getConvertInfo(videoInfo.jobId)
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, job }, null, 2),
+      }
+    }
+
+    const job = await MediaConvert.createJob(params).promise()
     await putVideoInfo(videoId, { ...videoInfo, jobId: job.Job.Id })
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: true,
-        url,
-        job,
-      }, null, 2),
+      body: JSON.stringify({ url, job }, null, 2),
     }
   } catch (e) {
     logger.error(e)
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: false,
-        error: e.message,
-      }, null, 2),
+      body: JSON.stringify({ error: e.message }, null, 2),
     }
   }
 }

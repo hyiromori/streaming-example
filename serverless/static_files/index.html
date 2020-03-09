@@ -85,7 +85,7 @@
           console.info(result)
           const { url } = result
 
-          const statusResponse = await fetch(`./status/${videoId}`)
+          const statusResponse = await fetch(`./info/${videoId}`)
           console.debug('#####', statusResponse)
 
           addMessages('変換に成功しました！')

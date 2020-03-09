@@ -101,9 +101,9 @@ functions:
           method: PUT
           path: 'convert/{id}'
 
-  status:
-    handler: handler/api/status.handler
+  info:
+    handler: handler/api/info.handler
     events:
       - http:
           method: GET
-          path: 'status/{id}'
+          path: 'info/{id}'
