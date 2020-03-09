@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk')
 const { logger } = require('../lib/logger')
+const { getVideoInfo, putVideoInfo } = require('../lib/dynamodb')
 
 const Bucket = process.env.S3_BUCKET
 const UploadPrefix = process.env.S3_UPLOAD_PREFIX
@@ -42,9 +43,11 @@ const getParams = (s3SourcePath, s3DestPath) => ({
 module.exports.handler = async (event) => {
   try {
     const videoId = event.pathParameters.id
+    const videoInfo = await getVideoInfo(videoId)
     const params = getParams(`s3://${Bucket}/${UploadPrefix}/${videoId}`, `s3://${Bucket}/${videoId}`)
     const job = await MediaConvert.createJob(params).promise()
     const url = `https://${CloudFrontDomain}/${videoId}/hls1/video.m3u8`
+    await putVideoInfo(videoId, { ...videoInfo, jobId: job.Job.Id })
 
     return {
       statusCode: 200,

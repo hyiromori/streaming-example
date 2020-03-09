@@ -33,13 +33,40 @@ provider:
       Action:
         - iam:PassRole
       Resource: "arn:aws:iam::#{AWS::AccountId}:role/MediaConvertRole"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.dynamodb_table}"
 
   environment:
     SERVERLESS_STAGE: ${self:provider.stage}
     S3_BUCKET: ${self:custom.s3_bucket}
     S3_UPLOAD_PREFIX: "_source"
     CLOUDFRONT_DOMAIN: "d1wfkbka4um3up.cloudfront.net"
+    DYNAMODB_TABLE: ${self:custom.dynamodb_table}
     MEDIACONVERT_ENDPOINT: ${self:custom.mediaconvert_endpoint}
+
+resources:
+  Resources:
+    DynamoDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamodb_table}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 1
+          # BillingMode: PAY_PER_REQUEST
 
 plugins:
   - serverless-offline
@@ -48,6 +75,7 @@ plugins:
 custom:
   s3_bucket: "example-video-distribution-${self:provider.stage}"
   mediaconvert_endpoint: "https://mpazqbhuc.mediaconvert.ap-northeast-1.amazonaws.com"
+  dynamodb_table: "video-distribution-${self:provider.stage}"
   serverless-offline:
     port: 4000
 
