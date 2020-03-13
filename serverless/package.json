@@ -1,5 +1,5 @@
 {
-  "name": "serverless-template",
+  "name": "example-video-distribution",
   "author": "hyiromori",
   "license": "MIT",
   "private": true,
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "deploy": "sls deploy --stage dev",
-    "deploy:prd": "sls deploy --stage prd",
+    "deploy:prod": "sls deploy --stage prod",
     "lint": "eslint --fix ./handler",
     "start": "sls offline"
   },

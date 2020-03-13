@@ -10,7 +10,7 @@ module.exports.handler = async (event) => {
   try {
     const id = uuid()
     const path = `_source/${id}`
-    const contentType = event.queryStringParameters['content-type']
+    const { contentType } = event.queryStringParameters
 
     const params = {
       Bucket,
@@ -18,15 +18,12 @@ module.exports.handler = async (event) => {
       ContentType: contentType,
       Expires: 3600, // 1 Hour
     }
-    const result = await S3.getSignedUrlPromise('putObject', params)
+    const uploadUrl = await S3.getSignedUrlPromise('putObject', params)
     await putVideoInfo(id, {})
 
     return {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        videoId: id,
-        uploadUrl: result,
-      }, null, 2),
+      body: JSON.stringify({ id, uploadUrl }, null, 2),
     }
   } catch (err) {
     logger.error(err)

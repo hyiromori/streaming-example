@@ -14,34 +14,34 @@ const createJob = (videoId) => {
     Settings: {
       Inputs: [
         {
-          FileInput: s3SourcePath,
-        },
+          FileInput: s3SourcePath
+        }
       ],
       OutputGroups: [
         {
           OutputGroupSettings: {
             HlsGroupSettings: {
-              Destination: `${s3DestPath}/hls1/video`,
-            },
-          },
+              Destination: `${s3DestPath}/hls1/video`
+            }
+          }
         },
         {
           OutputGroupSettings: {
             FileGroupSettings: {
-              Destination: `${s3DestPath}/thumbnail/image`,
-            },
-          },
-        },
-      ],
+              Destination: `${s3DestPath}/thumbnail/image`
+            }
+          }
+        }
+      ]
     },
-    JobTemplate: 'HLS_Template',
+    JobTemplate: 'HLS_Template'
   }
   return MediaConvert.createJob(params).promise()
 }
 
-const getJob = (jobId) => MediaConvert.getJob({ Id: jobId }).promise()
+const getJob = (id) => MediaConvert.getJob({ Id: id }).promise()
 
 module.exports = {
   createJob,
-  getJob,
+  getJob
 }

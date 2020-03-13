@@ -16,5 +16,5 @@ const putVideoInfo = async (id, params) => {
 
 module.exports = {
   getVideoInfo,
-  putVideoInfo,
+  putVideoInfo
 }

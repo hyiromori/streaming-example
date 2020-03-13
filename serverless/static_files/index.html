@@ -61,8 +61,8 @@
           }
 
           addMessages('アップロード準備をしています...')
-          const prepareResponse = await fetch(`./prepare?content-type=${encodeURIComponent(videoFile.type)}`)
-          const { videoId, uploadUrl } = await prepareResponse.json()
+          const prepareResponse = await fetch(`./prepare?contentType=${encodeURIComponent(videoFile.type)}`)
+          const { id, uploadUrl } = await prepareResponse.json()
 
           addMessages('映像ファイルをアップロードしています...')
           const uploadS3Response = await fetch(uploadUrl, {
@@ -75,35 +75,34 @@
           }
 
           addMessages('映像ファイルの変換をリクエストしています...')
-          const convertResponse = await fetch(`./convert/${videoId}`, { method: 'PUT' })
+          const convertResponse = await fetch(`./convert/${id}`, { method: 'PUT' })
           if (!convertResponse.ok) {
             alert('変換リクエストに失敗しました')
             return
           }
 
-          const result = await convertResponse.json()
-          console.info(result)
-          const { url } = result
-
           addMessages('変換完了を待っています...')
-          let latestStatus = ''
-          while (latestStatus !== 'COMPLETE' && latestStatus !== 'ERROR') {
+          let latestInfoResponse = { finished: false }
+          while (!latestInfoResponse.finished) {
             await (new Promise((resolve) => setTimeout(resolve, 1000)))
-            const infoResponse = await fetch(`./info/${videoId}`)
+            const infoResponse = await fetch(`./info/${id}`)
             const text = await infoResponse.text()
             if (!infoResponse.ok) {
               throw new Error(text)
             }
 
-            const json = JSON.parse(text)
-            latestStatus = json.job.Job.Status
+            latestInfoResponse = JSON.parse(text)
           }
 
-          if (latestStatus === 'COMPLETE') {
+          const { job, videos, thumbnails } = latestInfoResponse
+          if (job.Status === 'COMPLETE') {
             addMessages('変換に成功しました！')
             addMessages('')
             addMessages('以下のリンクをSafariで開くと結果が確認できます')
-            addMessages(`<a href="${url}">${url}</a>`)
+            videos.forEach(video => addMessages(`<a href="${video.url}" target="_blank">${video.url}</a>`))
+            addMessages('')
+            addMessages('サムネイル画像はこちら')
+            thumbnails.forEach(url => addMessages(`<a href="${url}" target="_blank">${url}</a>`))
           } else {
             addMessages('変換に失敗しました😢')
           }

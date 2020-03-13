@@ -18,7 +18,9 @@ provider:
       Action:
         - s3:GetObject
         - s3:PutObject
+        - s3:ListBucket
       Resource:
+        - "arn:aws:s3:::${self:custom.s3_bucket}"
         - "arn:aws:s3:::${self:custom.s3_bucket}/*"
     - Effect: Allow
       # https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/list_awselementalmediaconvert.html
