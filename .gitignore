@@ -30,3 +30,6 @@ override.tf.json
 
 node_modules
 .serverless
+
+mediaconvert/template/**
+!mediaconvert/template/.keep

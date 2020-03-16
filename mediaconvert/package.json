@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "apply": "node ./src/apply_template.js",
+    "get": "node ./src/get_template.js"
+  },
+  "author": "hyiromori",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.639.0"
+  }
+}
