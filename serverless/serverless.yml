@@ -1,4 +1,4 @@
-service: streaming
+service: video-distribution
 frameworkVersion: ">=1.60.0 <2.0.0"
 
 provider:
