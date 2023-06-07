@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "log4js": "^4.5.1",
-    "minimist": ">=1.2.2",
+    "minimist": ">=1.2.6",
     "serverless": "^1.81.1",
     "serverless-offline": "^5.12.1",
     "serverless-pseudo-parameters": "^2.5.0",
